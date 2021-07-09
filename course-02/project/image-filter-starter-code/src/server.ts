@@ -33,9 +33,19 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
-    res.send("try GET /filteredimage?image_url={{}}")
-  } );
+  app.get("/filteredimage", async(req, res) => {
+    const {image_url} = req.query; 
+    if(!image_url) {
+      res.status(400).send("Url is required");
+    }
+    var resp = await filterImageFromURL(image_url);
+    if(!resp) {
+      res.status(417).send("Image cannot be extracted");
+    }
+    res.sendFile(resp);
+    deleteLocalFiles([resp]);
+    res.status(201).send("Done");
+  });
   
 
   // Start the Server
